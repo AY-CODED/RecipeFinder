@@ -1,11 +1,15 @@
 import React from 'react';
-import { Leaf, Utensils, ChevronRight } from 'lucide-react';
+import { ChevronRight, CheckCircle2 } from 'lucide-react';
 
 const RecipeCard = ({ recipe, onClick }) => {
+  const isPerfectMatch = recipe.matchCount === recipe.totalIngredients;
+
   return (
     <div
       onClick={() => onClick(recipe.idMeal)}
-      className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col h-full"
+      className={`group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-2 flex flex-col h-full ${
+        isPerfectMatch ? 'border-green-500/50 shadow-green-500/5 bg-green-50/5' : 'border-gray-100'
+      }`}
     >
       <div className="relative aspect-[4/5] overflow-hidden">
         <img
@@ -16,13 +20,16 @@ const RecipeCard = ({ recipe, onClick }) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Source Icon Badge */}
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-2xl shadow-sm">
-          {recipe.source === 'ingredient' ? (
-            <Leaf className="w-4 h-4 text-green-500" />
-          ) : (
-            <Utensils className="w-4 h-4 text-orange-500" />
-          )}
+        {/* Match Badge */}
+        <div className={`absolute top-4 right-4 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-sm border flex items-center gap-1.5 ${
+          isPerfectMatch
+            ? 'bg-green-500 text-white border-green-400'
+            : 'bg-white/90 text-gray-700 border-white/50'
+        }`}>
+          {isPerfectMatch && <CheckCircle2 className="w-3.5 h-3.5" />}
+          <span className="text-xs font-bold tracking-tight">
+            Matches {recipe.matchCount}/{recipe.totalIngredients}
+          </span>
         </div>
       </div>
       <div className="p-5 flex flex-col flex-grow">
@@ -33,7 +40,11 @@ const RecipeCard = ({ recipe, onClick }) => {
           <span className="text-sm font-semibold text-orange-500">
             View Recipe
           </span>
-          <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+            isPerfectMatch
+              ? 'bg-green-100 text-green-600 group-hover:bg-green-500 group-hover:text-white'
+              : 'bg-gray-50 group-hover:bg-orange-500 group-hover:text-white'
+          }`}>
             <ChevronRight className="w-4 h-4" />
           </div>
         </div>

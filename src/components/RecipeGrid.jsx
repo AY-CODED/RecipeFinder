@@ -1,5 +1,5 @@
 import React from 'react';
-import { SearchX } from 'lucide-react';
+import { SearchX, ShoppingBasket } from 'lucide-react';
 import RecipeCard from './RecipeCard';
 
 const RecipeGrid = ({ recipes, loading, onRecipeClick }) => {
@@ -28,9 +28,9 @@ const RecipeGrid = ({ recipes, loading, onRecipeClick }) => {
         <div className="bg-orange-50 w-24 h-24 rounded-full flex items-center justify-center mb-6">
           <SearchX className="w-12 h-12 text-orange-500" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900">Try a different keyword</h3>
+        <h3 className="text-2xl font-bold text-gray-900">No matching recipes</h3>
         <p className="text-gray-500 mt-2 max-w-sm">
-          We couldn't find any recipes matching your search. Try searching for an ingredient like "Chicken" or a dish like "Pasta".
+          We couldn't find any recipes with those ingredients. Try removing some or adding more common ones like "Chicken" or "Rice".
         </p>
       </div>
     );
@@ -38,8 +38,13 @@ const RecipeGrid = ({ recipes, loading, onRecipeClick }) => {
 
   if (recipes.length === 0) {
     return (
-       <div className="flex flex-col items-center justify-center py-20 text-center opacity-50">
-          <p className="text-gray-400 font-medium">Your search results will appear here</p>
+       <div className="flex flex-col items-center justify-center py-32 text-center opacity-70">
+          <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+            <ShoppingBasket className="w-10 h-10 text-gray-400" />
+          </div>
+          <p className="text-gray-500 font-medium max-w-xs leading-relaxed">
+            Enter the ingredients you have to see what you can cook right now!
+          </p>
        </div>
     );
   }

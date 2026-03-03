@@ -8,40 +8,58 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedMealId, setSelectedMealId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [ingredients, setIngredients] = useState([]);
 
-  const handleSearch = async (query) => {
-    if (!query.trim()) return;
+  const handleSearch = async (ingredientsArray) => {
+    if (ingredientsArray.length === 0) {
+      setRecipes([]);
+      setIngredients([]);
+      return;
+    }
 
     setLoading(true);
-    setSearchTerm(query);
+    setIngredients(ingredientsArray);
     setSelectedMealId(null);
 
     try {
-      const [ingRes, nameRes] = await Promise.all([
-        fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${query}`).then(r => r.json()),
-        fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`).then(r => r.json())
-      ]);
+      const requests = ingredientsArray.map(ing =>
+        fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ing.toLowerCase().trim()}`).then(r => r.json())
+      );
 
-      const ingMeals = ingRes.meals || [];
-      const nameMeals = nameRes.meals || [];
+      const results = await Promise.all(requests);
+      const mealsLists = results.map(data => data.meals || []);
 
-      const combinedMap = new Map();
+      const mealMap = new Map();
 
-      // Ingredient matches get the 'ingredient' source
-      ingMeals.forEach(meal => {
-        combinedMap.set(meal.idMeal, { ...meal, source: 'ingredient' });
+      mealsLists.forEach((list) => {
+        list.forEach(meal => {
+          if (mealMap.has(meal.idMeal)) {
+            const entry = mealMap.get(meal.idMeal);
+            entry.matchCount += 1;
+          } else {
+            mealMap.set(meal.idMeal, {
+              ...meal,
+              matchCount: 1,
+              totalIngredients: ingredientsArray.length
+            });
+          }
+        });
       });
 
-      // Name matches get the 'name' source (if not already found via ingredient)
-      nameMeals.forEach(meal => {
-        if (!combinedMap.has(meal.idMeal)) {
-          combinedMap.set(meal.idMeal, { ...meal, source: 'name' });
-        }
-      });
+      const combinedResults = Array.from(mealMap.values());
 
-      const mergedResults = Array.from(combinedMap.values());
-      setRecipes(mergedResults.length > 0 ? mergedResults : null);
+      // Intersection: recipes matching ALL ingredients
+      const intersection = combinedResults.filter(m => m.matchCount === ingredientsArray.length);
+
+      let finalResults;
+      if (intersection.length > 0) {
+        finalResults = intersection;
+      } else {
+        // Fallback: Union sorted by match count
+        finalResults = combinedResults.sort((a, b) => b.matchCount - a.matchCount);
+      }
+
+      setRecipes(finalResults.length > 0 ? finalResults : null);
     } catch (error) {
       console.error("Error fetching recipes:", error);
       setRecipes(null);
@@ -62,12 +80,15 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={handleSearch} ingredients={ingredients} />
 
-        {searchTerm && !loading && recipes && recipes.length > 0 && (
+        {ingredients.length > 0 && !loading && recipes && recipes.length > 0 && (
           <div className="mb-8">
             <h2 className="text-gray-500 font-medium">
-              Showing results for <span className="text-gray-900 font-bold">"{searchTerm}"</span>
+              Showing recipes using <span className="text-gray-900 font-bold">{ingredients.join(', ')}</span>
+              {recipes[0].matchCount < ingredients.length && (
+                <span className="ml-2 text-orange-600">(Partial matches)</span>
+              )}
             </h2>
           </div>
         )}
