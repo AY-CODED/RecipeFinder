@@ -6,23 +6,23 @@ const RecipeModal = ({ mealId, onClose }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchRecipeDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`);
+        const data = await response.json();
+        setRecipe(data.meals[0]);
+      } catch (error) {
+        console.error("Error fetching recipe details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (mealId) {
       fetchRecipeDetails();
     }
   }, [mealId]);
-
-  const fetchRecipeDetails = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`);
-      const data = await response.json();
-      setRecipe(data.meals[0]);
-    } catch (error) {
-      console.error("Error fetching recipe details:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (!mealId) return null;
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { SearchX } from 'lucide-react';
 import RecipeCard from './RecipeCard';
 
 const RecipeGrid = ({ recipes, loading, onRecipeClick }) => {
@@ -25,11 +26,11 @@ const RecipeGrid = ({ recipes, loading, onRecipeClick }) => {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in zoom-in duration-500">
         <div className="bg-orange-50 w-24 h-24 rounded-full flex items-center justify-center mb-6">
-          <span className="text-5xl">🥘</span>
+          <SearchX className="w-12 h-12 text-orange-500" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900">No matching recipes</h3>
+        <h3 className="text-2xl font-bold text-gray-900">Try a different keyword</h3>
         <p className="text-gray-500 mt-2 max-w-sm">
-          We couldn't find any recipes with that ingredient. How about trying "Beef", "Apple" or "Honey"?
+          We couldn't find any recipes matching your search. Try searching for an ingredient like "Chicken" or a dish like "Pasta".
         </p>
       </div>
     );

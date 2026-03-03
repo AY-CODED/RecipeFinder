@@ -27,7 +27,7 @@ const SearchBar = ({ onSearch }) => {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter one main ingredient..."
+          placeholder="Enter ingredients (e.g., chicken, pasta)"
           className="w-full px-8 py-5 text-lg bg-white border border-gray-200 rounded-3xl shadow-xl shadow-orange-500/5 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all pr-16"
         />
         <button
